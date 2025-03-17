@@ -33,16 +33,27 @@ void PhysicsWorld_t::update( float dt )
          force->apply( obj );
       }
 
-      obj.velocity = Vector2Add( obj.velocity, Vector2Scale( obj.acceleration, dt ) );   // v = a * t
-      obj.position = Vector2Add( obj.position, Vector2Scale( obj.velocity, dt ) );       // v = s / t
+      obj.velocity = Vector2Add(
+          obj.velocity, Vector2Scale( obj.acceleration, dt ) );   // v = a * t
+      obj.position = Vector2Add(
+          obj.position, Vector2Scale( obj.velocity, dt ) );   // v = s / t
 
-      std::cout << "-------------- " << obj.position.x << " " << obj.position.y << "\n";
+      std::cout << "-------------- " << obj.position.x << " " << obj.position.y
+                << " " << obj.acceleration.y << "\n";
+      std::cout << "+++++++ " << obj.velocity.y << "\n";
 
       // Check collision with ground
-      if ( obj.position.y + obj.radius > groundY )
+      if ( obj.position.y + obj.radius > groundY && obj.velocity.y > 0 )
       {
-         obj.position.y = groundY - obj.radius;   // Stop at ground
-         obj.velocity.y = 0.0f;   // Zero out vertical velocity
+         if ( obj.velocity.y > 0.5f )
+         {
+            obj.velocity.y = -obj.velocity.y * 0.7f;   // Reverse with factor
+         }
+         else
+         {
+            obj.velocity.y = 0.0f;   // Stop the ball
+         }
+         obj.position.y = groundY - obj.radius;   // Always correct position
       }
    }
 }
