@@ -1,72 +1,65 @@
 #include <iostream>
 
+#include "GravityForce.h"
+#include "PhysicsObject.h"
+#include "PhysicsWorld.h"
+#include "Renderer.h"
 #include "raylib.h"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
-int main(void)
+int main( void )
 {
-    // Initialization
-    //---------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+   // Initialization
+   //---------------------------------------------------------
+   const int screenWidth  = 800;
+   const int screenHeight = 450;
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(screenWidth, screenHeight, "raylib [shapes] example - bouncing ball");
+   // Initialize Raylib window
+   InitWindow( screenWidth, screenHeight, "2D Physics - Falling Circle" );
+   SetTargetFPS( 60 );   // Target 60 frames per second
 
-    Vector2 ballPosition = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
-    Vector2 ballSpeed = { 5.0f, 4.0f };
-    int ballRadius = 20;
+   // Create PhysicsWorld with ground at screenHeight
+   sand::PhysicsWorld_t world( screenHeight );
 
-    bool pause = 0;
-    int framesCounter = 0;
+   // Create Renderer with screen dimensions
+   sand::Renderer_t renderer( screenWidth, screenHeight );
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //----------------------------------------------------------
+   // Create the circle PhysicsObject
+   sand::PhysicsObject_t circle;
+   circle.position = { screenWidth / 2.0f,
+                       50.0f };        // Start at center horizontally, near top
+   circle.velocity = { 0.0f, 0.0f };   // Initial velocity
+   circle.mass     = 1.0f;             // Arbitrary mass
+   circle.radius   = 20.0f;            // Circle radius
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        // Update
-        //-----------------------------------------------------
-        if (IsKeyPressed(KEY_SPACE)) pause = !pause;
+   // Add circle to PhysicsWorld
+   world.addObject( circle );
 
-        if (!pause)
-        {
-            ballPosition.x += ballSpeed.x;
-            ballPosition.y += ballSpeed.y;
+   // Create GravityForce with gravity strength (e.g., 980 pixels/s^2)
+   std::unique_ptr<sand::Force_t> gravity =
+       std::make_unique<sand::GravityForce_t>(
+           980.0f );   // Assuming GravityForce constructor takes a float
 
-            // Check walls collision for bouncing
-            if ((ballPosition.x >= (GetScreenWidth() - ballRadius)) || (ballPosition.x <= ballRadius)) ballSpeed.x *= -1.0f;
-            if ((ballPosition.y >= (GetScreenHeight() - ballRadius)) || (ballPosition.y <= ballRadius)) ballSpeed.y *= -1.0f;
-        }
-        else framesCounter++;
-        //-----------------------------------------------------
+   // Add gravity to PhysicsWorld
+   world.addForce( std::move( gravity ) );
 
-        // Draw
-        //-----------------------------------------------------
-        BeginDrawing();
+   // Main game loop
+   while ( !WindowShouldClose() )
+   {
+      // Get time since last frame
+      float dt = GetFrameTime();
 
-            ClearBackground(RAYWHITE);
+      // Update physics simulation
+      world.update( dt );
 
-            DrawCircleV(ballPosition, (float)ballRadius, MAROON);
-            DrawText("PRESS SPACE to PAUSE BALL MOVEMENT", 10, GetScreenHeight() - 25, 20, LIGHTGRAY);
+      // Render the scene
+      renderer.render( world );
+   }
 
-            // On pause, we draw a blinking message
-            if (pause && ((framesCounter/30)%2)) DrawText("PAUSED", 350, 200, 30, GRAY);
+   // Cleanup
+   CloseWindow();
 
-            DrawFPS(10, 10);
-
-        EndDrawing();
-        //-----------------------------------------------------
-    }
-
-    // De-Initialization
-    //---------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //----------------------------------------------------------
-
-    return 0;
+   return 0;
 }
-
