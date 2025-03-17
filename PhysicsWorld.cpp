@@ -38,10 +38,6 @@ void PhysicsWorld_t::update( float dt )
       obj.position = Vector2Add(
           obj.position, Vector2Scale( obj.velocity, dt ) );   // v = s / t
 
-      std::cout << "-------------- " << obj.position.x << " " << obj.position.y
-                << " " << obj.acceleration.y << "\n";
-      std::cout << "+++++++ " << obj.velocity.y << "\n";
-
       // Check collision with ground
       if ( obj.position.y + obj.radius > groundY && obj.velocity.y > 0 )
       {
