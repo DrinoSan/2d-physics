@@ -10,10 +10,10 @@ class GravityForce_t : public Force_t
 {
  public:
    GravityForce_t( float gravity_ ) : gravity{ gravity_ } {}
-   void apply( PhysicsObject_t& obj ) override
+   void apply( PhysicsObject_t* obj ) override
    {
       //obj.acceleration = { obj.acceleration.x, obj.acceleration.y + gravity };
-      obj.acceleration.y += gravity;
+      obj->acceleration.y += gravity;
    }
 
 

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "GravityForce.h"
-#include "PhysicsObject.h"
+#include "CircleObject.h"
 #include "PhysicsWorld.h"
 #include "Renderer.h"
 #include "raylib.h"
@@ -21,21 +21,19 @@ int main( void )
    SetTargetFPS( 60 );   // Target 60 frames per second
 
    // Create PhysicsWorld with ground at screenHeight
-   sand::PhysicsWorld_t world( screenHeight );
+   sand::PhysicsWorld_t world( screenHeight - 10 );
 
    // Create Renderer with screen dimensions
    sand::Renderer_t renderer( screenWidth, screenHeight );
 
    // Create the circle PhysicsObject
-   sand::PhysicsObject_t circle;
-   circle.position = { screenWidth / 2.0f,
-                       50.0f };        // Start at center horizontally, near top
-   circle.velocity = { 0.0f, 0.0f };   // Initial velocity
-   circle.mass     = 1.0f;             // Arbitrary mass
-   circle.radius   = 20.0f;            // Circle radius
+   std::unique_ptr<sand::PhysicsObject_t> circle =
+       std::make_unique<sand::CircleObject_t>( 20.0f );
+   circle->position = { screenWidth / 2.0f,
+                        50.0f };   // Start at center horizontally, near top
 
    // Add circle to PhysicsWorld
-   world.addObject( circle );
+   world.addObject( std::move( circle ) );
 
    // Create GravityForce with gravity strength (e.g., 980 pixels/s^2)
    std::unique_ptr<sand::Force_t> gravity =

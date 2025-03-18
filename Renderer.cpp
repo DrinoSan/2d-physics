@@ -12,8 +12,7 @@ void Renderer_t::render( const PhysicsWorld_t& world )
 
    for ( const auto& obj : world.getObjects() )
    {
-      DrawCircleV( obj.position, obj.radius,
-                   RED );   // TODO: create draw function for objects
+      obj->render();
    }
 
    DrawLine( 0, world.getGroundY(), screenWidth, world.getGroundY(),

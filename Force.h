@@ -8,7 +8,7 @@ class PhysicsObject_t;
 class Force_t
 {
  public:
-   virtual void apply( PhysicsObject_t& obj ) = 0;
+   virtual void apply( PhysicsObject_t* obj ) = 0;
 
    virtual ~Force_t() = default;
 };

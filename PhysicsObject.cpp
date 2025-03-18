@@ -5,11 +5,21 @@
 
 namespace sand
 {
+// ----------------------------------------------------------------------------
 PhysicsObject_t::PhysicsObject_t( Vector2 position_, Vector2 velocity_,
-                                  float mass_, float radius_ )
-    : position{ position_ }, velocity{ velocity_ }, mass{ mass_ },
-      radius{ radius_ }
+                                  float mass_ )
+    : position{ position_ }, velocity{ velocity_ }, mass{ mass_ }
 {
    std::cout << "Created Physics object\n";
 }
+
+// ----------------------------------------------------------------------------
+void PhysicsObject_t::update( float dt )
+{
+   velocity =
+       Vector2Add( velocity, Vector2Scale( acceleration, dt ) );   // v = a * t
+   position =
+       Vector2Add( position, Vector2Scale( velocity, dt ) );   // v = s / t
+}
+
 };   // namespace sand
