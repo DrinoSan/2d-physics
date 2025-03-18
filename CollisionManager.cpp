@@ -70,14 +70,14 @@ bool CollisionManager_t::checkCollision( const PhysicsObject_t& obj1,
 
 // ----------------------------------------------------------------------------
 bool CollisionManager_t::checkCircleCircle( const PhysicsObject_t& obj1,
-                        const PhysicsObject_t& obj2 )
+                                            const PhysicsObject_t& obj2 )
 {
    return false;
 }
 
 // ----------------------------------------------------------------------------
 bool CollisionManager_t::checkCircleRectangle( const PhysicsObject_t& obj1,
-                           const PhysicsObject_t& obj2 )
+                                               const PhysicsObject_t& obj2 )
 {
    return false;
 }
