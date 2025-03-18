@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "CollisionManager.h"
 #include "PhysicsWorld.h"
 
 namespace sand
@@ -35,10 +36,7 @@ void PhysicsWorld_t::update( float dt )
       // Reset acceleration so we dont carry it from previous frames...
       obj->acceleration = { 0.0f, 0.0f };
 
-      if ( obj->getBottomExtent() > groundY && obj->velocity.y > 0 )
-      {
-         obj->onGroundCollision( groundY );
-      }
+      collisionManager.checkCollisions( objects, groundY );
    }
 }
 

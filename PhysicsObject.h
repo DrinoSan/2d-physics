@@ -8,11 +8,20 @@
 
 namespace sand
 {
+enum class ObjectType
+{
+   Circle,
+   Rectangle,
+   Triangle,
+   Custom,
+   None,
+};
+
 class PhysicsObject_t
 {
  public:
    PhysicsObject_t( Vector2 position_ = { 400 / 2.0f, 50.0f },
-                    Vector2 velocity_ = { 0.0f, 0.0f }, float mass_ = 1.0f );
+                    Vector2 velocity_ = { 0.0f, 0.0f }, float mass_ = 1.0f, ObjectType type_ = ObjectType::None  );
 
    virtual ~PhysicsObject_t() = default;
 
@@ -32,7 +41,8 @@ class PhysicsObject_t
    Vector2 position;       // Position in 2D space
    Vector2 velocity;       // Velocity in pixels/s
    Vector2 acceleration;   // Acceleration in pixels/s^2
-   float   mass;           // Mass (unused here but included for extensibility)
+   float   mass;           // Mass not used currently but later..
+   ObjectType type;
 };
 
 };   // namespace sand

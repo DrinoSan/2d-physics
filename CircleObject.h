@@ -8,7 +8,13 @@ namespace sand
 class CircleObject_t : public PhysicsObject_t
 {
  public:
-   CircleObject_t( float radius_ = 20.0f ) : radius{ radius_ } {}
+   CircleObject_t( float      radius_ = 20.0f,
+                   ObjectType type_   = ObjectType::Circle )
+       : radius{ radius_ }
+   {
+      type = type_;
+   }
+
    ~CircleObject_t() override = default;
 
    void  update( float dt ) override;

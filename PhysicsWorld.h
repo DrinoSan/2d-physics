@@ -6,6 +6,7 @@
 
 #include "Force.h"
 #include "PhysicsObject.h"
+#include "CollisionManager.h"
 
 namespace sand
 {
@@ -29,6 +30,8 @@ class PhysicsWorld_t
                                          objects;   // List of physics objects
    std::vector<std::unique_ptr<Force_t>> forces;    // List of forces
    float                                 groundY;   // Y-position of the ground
+
+   CollisionManager_t collisionManager{};
 };
 };   // namespace sand
 
