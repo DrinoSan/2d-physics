@@ -32,8 +32,13 @@ int main( void )
    circle->position = { screenWidth / 2.0f,
                         50.0f };   // Start at center horizontally, near top
 
+   std::unique_ptr<sand::PhysicsObject_t> circle2 =
+       std::make_unique<sand::CircleObject_t>( 10.0f );
+   circle2->position = { (screenWidth / 2.0f), 50.0f };   // Start at center horizontally, near top
+
    // Add circle to PhysicsWorld
    world.addObject( std::move( circle ) );
+   world.addObject( std::move( circle2 ) );
 
    // Create GravityForce with gravity strength (e.g., 980 pixels/s^2)
    std::unique_ptr<sand::Force_t> gravity =

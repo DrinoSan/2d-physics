@@ -21,7 +21,8 @@ class PhysicsObject_t
 {
  public:
    PhysicsObject_t( Vector2 position_ = { 400 / 2.0f, 50.0f },
-                    Vector2 velocity_ = { 0.0f, 0.0f }, float mass_ = 1.0f, ObjectType type_ = ObjectType::None  );
+                    Vector2 velocity_ = { 0.0f, 0.0f }, float mass_ = 1.0f,
+                    ObjectType type_ = ObjectType::None );
 
    virtual ~PhysicsObject_t() = default;
 
@@ -32,16 +33,19 @@ class PhysicsObject_t
    // Check if object hit the ground
    virtual void onGroundCollision( float groundY ) = 0;
 
+   // Resolve colision
+   virtual void onObjectCollision( PhysicsObject_t& other ) = 0;
+
    // Get lowest point of object
    virtual float getBottomExtent() const = 0;
 
    // Function to draw given object
    virtual void render() const = 0;
 
-   Vector2 position;       // Position in 2D space
-   Vector2 velocity;       // Velocity in pixels/s
-   Vector2 acceleration;   // Acceleration in pixels/s^2
-   float   mass;           // Mass not used currently but later..
+   Vector2    position;       // Position in 2D space
+   Vector2    velocity;       // Velocity in pixels/s
+   Vector2    acceleration;   // Acceleration in pixels/s^2
+   float      mass;           // Mass not used currently but later..
    ObjectType type;
 };
 

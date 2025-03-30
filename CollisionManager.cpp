@@ -1,39 +1,41 @@
 #include "CollisionManager.h"
+#include "CircleObject.h"
 
-namespace sand
-{
-// ----------------------------------------------------------------------------
-void CollisionManager_t::checkCollisions(
-    const std::vector<std::unique_ptr<PhysicsObject_t>>& objects,
-    float                                                groundY )
-{
-   for ( auto& obj : objects )
+   namespace sand
    {
-      if ( obj->getBottomExtent() > groundY && obj->velocity.y > 0 )
+   // ----------------------------------------------------------------------------
+   void CollisionManager_t::checkCollisions(
+       const std::vector<std::unique_ptr<PhysicsObject_t>>& objects,
+       float                                                groundY )
+   {
+      for ( auto& obj : objects )
       {
-         // Should be called for each object
-         obj->onGroundCollision( groundY );
-
-         // TODO: Add collision handling for each object pair
-         for ( size_t i = 0; i < objects.size(); ++i )
+         if ( obj->getBottomExtent() > groundY && obj->velocity.y > 0 )
          {
-            for ( size_t j = i + 1; i < objects.size() - 1; ++j )
-            {
-               // TODO: Implement me
-               // if( ! checkCollision( *objects[i], *objects[j] ) )
-               //{
-               //   continue;
-               //}
-
-               // objects[i]->onObjectCollision( *objects[j],.... );
-               // objects[j]->onObjectCollision( *objects[i],.... );
-            }
+            // Should be called for each object
+            obj->onGroundCollision( groundY );
          }
       }
-   }
-}
 
-// ----------------------------------------------------------------------------
+      for( auto& obj : objects )
+      {
+            // TODO: Add collision handling for each object pair
+            for ( size_t i = 0; i < objects.size(); ++i )
+            {
+               for ( size_t j = i + 1; j < objects.size(); ++j )
+               {
+                  if ( !checkCollision( *objects[ i ], *objects[ j ] ) )
+                  {
+                     continue;
+                  }
+
+                  objects[i]->onObjectCollision( *objects[j] );
+               }
+            }
+      }
+   }
+
+   // ----------------------------------------------------------------------------
 bool CollisionManager_t::checkCollision( const PhysicsObject_t& obj1,
                                          const PhysicsObject_t& obj2 )
 {
@@ -72,7 +74,13 @@ bool CollisionManager_t::checkCollision( const PhysicsObject_t& obj1,
 bool CollisionManager_t::checkCircleCircle( const PhysicsObject_t& obj1,
                                             const PhysicsObject_t& obj2 )
 {
-   return false;
+   const CircleObject_t* c1 = dynamic_cast<const CircleObject_t*>( &obj1 );
+   const CircleObject_t* c2 = dynamic_cast<const CircleObject_t*>( &obj2 );
+
+   // Distance between Center A and Center B
+   auto d = Vector2Distance( c1->position, c2->position );
+
+   return d <= c1->radius + c2->radius;
 }
 
 // ----------------------------------------------------------------------------
