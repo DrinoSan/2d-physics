@@ -13,17 +13,17 @@ void CircleObject_t::update( float dt )
 void CircleObject_t::onGroundCollision( float groundY )
 {
    // Check collision with ground
-   if ( velocity.y > 0.5f )
+   if ( velocity.y > 3.0f )
    {
       velocity.y = -velocity.y * 0.7f;   // Reverse with factor
    }
    else
    {
-      velocity.y = 0.0f;   // Stop the ball
+      velocity.y = 0.0f;   // Stop the ball, but will again be changes after gravity hits and then the collision will be checked and so on
+      // To be more precise gravity will change the accelration field and physicObject::update will change the velocity
    }
 
-   // Basic update to make sure the object does not fall under the ground
-   position.y = groundY - radius;   // Always correct position
+   position.y = groundY - radius;   // Always correct position so it does not fall under the line
 }
 
 // ----------------------------------------------------------------------------
