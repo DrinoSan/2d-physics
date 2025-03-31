@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <iostream>
 
 #include "GravityForce.h"
@@ -20,37 +21,33 @@ int main( void )
    InitWindow( screenWidth, screenHeight, "2D Physics - Falling Circle" );
    SetTargetFPS( 60 );   // Target 60 frames per second
 
-   // Create PhysicsWorld with ground at screenHeight
+   // Create PhysicsWorld
    sand::PhysicsWorld_t world( screenHeight - 10 );
 
-   // Create Renderer with screen dimensions
+   // Create Renderer
    sand::Renderer_t renderer( screenWidth, screenHeight );
-
-   // Create the circle PhysicsObject
-   std::unique_ptr<sand::PhysicsObject_t> circle =
-       std::make_unique<sand::CircleObject_t>( 20.0f );
-   circle->position = { screenWidth / 2.0f,
-                        50.0f };   // Start at center horizontally, near top
-
-   std::unique_ptr<sand::PhysicsObject_t> circle2 =
-       std::make_unique<sand::CircleObject_t>( 10.0f );
-   circle2->position = { (screenWidth / 2.0f), 50.0f };   // Start at center horizontally, near top
-
-   // Add circle to PhysicsWorld
-   world.addObject( std::move( circle ) );
-   world.addObject( std::move( circle2 ) );
 
    // Create GravityForce with gravity strength (e.g., 980 pixels/s^2)
    std::unique_ptr<sand::Force_t> gravity =
        std::make_unique<sand::GravityForce_t>(
-           980.0f );   // Assuming GravityForce constructor takes a float
+           300.0f );
 
-   // Add gravity to PhysicsWorld
+   // Add gravity
    world.addForce( std::move( gravity ) );
 
    // Main game loop
    while ( !WindowShouldClose() )
    {
+      if ( IsMouseButtonPressed( MOUSE_BUTTON_LEFT ) )
+      {
+         // Create the circle PhysicsObject
+         std::unique_ptr<sand::PhysicsObject_t> circle =
+             std::make_unique<sand::CircleObject_t>( 20.0f );
+         circle->position = GetMousePosition();
+
+         // Add circle to PhysicsWorld
+         world.addObject( std::move( circle ) );
+      }
       // Get time since last frame
       float dt = GetFrameTime();
 

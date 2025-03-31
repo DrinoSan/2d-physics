@@ -42,6 +42,19 @@ class PhysicsObject_t
    // Function to draw given object
    virtual void render() const = 0;
 
+   // Dump
+   // clang-format off
+   virtual void dump() const
+   {
+       std::cout << "==========OBJECT DUMP==========\n";
+       std::cout << "Position:     (" << position.x << ", " << position.y << ") pixels\n";
+       std::cout << "Velocity:     (" << velocity.x << ", " << velocity.y << ") pixels/s\n";
+       std::cout << "Acceleration: (" << acceleration.x << ", " << acceleration.y << ") pixels/s^2\n";
+       std::cout << "Mass:         " << mass << " units\n";
+       std::cout << "==============================\n";
+   }
+   // clang-format on
+
    Vector2    position;       // Position in 2D space
    Vector2    velocity;       // Velocity in pixels/s
    Vector2    acceleration;   // Acceleration in pixels/s^2

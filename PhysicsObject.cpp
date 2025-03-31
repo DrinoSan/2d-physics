@@ -20,6 +20,9 @@ void PhysicsObject_t::update( float dt )
        Vector2Add( velocity, Vector2Scale( acceleration, dt ) );   // v = a * t
    position =
        Vector2Add( position, Vector2Scale( velocity, dt ) );   // v = s / t
+   // Renderer only needs the position and other child class related values depending on render function in child
 }
+
+
 
 };   // namespace sand

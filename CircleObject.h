@@ -22,6 +22,19 @@ class CircleObject_t : public PhysicsObject_t
    float getBottomExtent() const override { return position.y + radius; }
    void  onObjectCollision( PhysicsObject_t& other ) override;
 
+   // clang-format off
+   void dump() const override
+   {
+       // Call parent class dump first
+       PhysicsObject_t::dump();
+
+       // Add child class specific members
+       std::cout << "==========SPACESHIP DETAILS==========\n";
+       std::cout << "Radius:         " << radius << " units\n";
+       std::cout << "=====================================\n";
+   }
+   // clang-format on
+
    void render() const override { DrawCircleV( position, radius, RED ); }
 
    float radius;   // Radius for rendering and collision

@@ -1,4 +1,5 @@
 #include "CircleObject.h"
+#include <assert.h>
 
 namespace sand
 {
@@ -28,100 +29,87 @@ void CircleObject_t::onGroundCollision( float groundY )
 // ----------------------------------------------------------------------------
 void CircleObject_t::onObjectCollision( PhysicsObject_t& other )
 {
+   // Check if the other object is a circle
+   CircleObject_t* otherCircle = dynamic_cast<CircleObject_t*>( &other );
 
-   switch ( other.type )
+   // For all the math:
+   // https://mathworld.wolfram.com/Circle-CircleIntersection.html
+
+   // Calculate the distance between the centers of the two circles
+   float d = Vector2Distance( position, otherCircle->position );
+
+   Vector2     v;
+   const float epsilon = 0.0001f;
+   if ( d < epsilon )   // Das ist nur notwendig wenn sie quasi ineinander
+                        // starten also fucking klein
    {
-   case ObjectType::Circle:
-   {
-      // We already know we have a collision so no need to check that here
-
-      // Casting to pointer because references can couse exception while pointer
-      // would just return a nullptr
-      auto* otherCircle = dynamic_cast<CircleObject_t*>( &other );
-
-      // Circle A, Circle B
-      // Getting distance between AB
-      auto d = Vector2Distance( position, otherCircle->position );
-
-      // Avoid division by zero if circles are exactly on top of each other.
-      // Finding this took wayyyy to long
-      Vector2     v;
-      const float epsilon = 0.0001f;
-      if ( d < epsilon )   // This happens when the circles basically start
-                           // inside eachother
-      {
-         // Whatever direction
-         v = { 1.0f, 0.0f };
-         d = epsilon;   // d was fucking small
-      }
-      else
-      {
-         auto AB = Vector2Subtract( position, otherCircle->position );
-
-         // Getting the unit vector
-         v = Vector2Normalize( AB );
-      }
-
-      // Getting the collision point, this is not necessary but i want to do it
-      // fuck it. Getting distance to the collision point, check:
-      // https://mathworld.wolfram.com/Circle-CircleIntersection.html
-      auto dSquare  = d * d;
-      auto r1Square = radius * radius;
-      auto r2Square = otherCircle->radius * otherCircle->radius;
-      // Distance
-      auto h = ( dSquare + r1Square - r2Square ) / ( 2 * d );
-
-      // Collision Point if no bounce back
-      auto M = Vector2Add( position, Vector2Scale( v, h ) );
-      std::cout << "Collision point position: (" << M.x << "," << M.y << ")\n";
-
-      // Calculate relative velocity.
-      Vector2 relVelocity = Vector2Subtract( otherCircle->velocity, velocity );
-      float   velocityAlongNormal = Vector2DotProduct( relVelocity, v );
-
-      // Push the second circle back so they only touch
-      // Calculate overlap
-      auto p = radius + otherCircle->radius - d;
-
-      // Calculate how much of a pushback is needed we divide by 0.5 because we apply it to both objects
-      auto correction = Vector2Scale( v, p * 0.5f );
-
-      // If objects are nearly at rest relative to each other,
-      // just separate them without applying an impulse.
-      if ( fabs( velocityAlongNormal ) < EPSILON )
-      {
-         position = Vector2Subtract( position, correction );
-         otherCircle->position =
-             Vector2Add( otherCircle->position, correction );
-
-         return;
-      }
-
-      // Push
-      position              = Vector2Subtract( position, correction );
-      otherCircle->position = Vector2Add( otherCircle->position, correction );
-
-      // Adding impulse or bounce
-      float   e           = 1.0f;   // Fully elastic
-
-      // If moving apart, no bounce needed
-      if ( velocityAlongNormal > 0 )
-      {
-         return;
-      }
-
-      float m1      = mass;
-      float m2      = otherCircle->mass;
-      float impulse = -( 1 + e ) * velocityAlongNormal / ( 1 / m1 + 1 / m2 );
-
-      Vector2 impulseVector = Vector2Scale( v, impulse );
-      velocity = Vector2Add( velocity, Vector2Scale( impulseVector, 1 / m1 ) );
-      otherCircle->velocity = Vector2Subtract(
-          otherCircle->velocity, Vector2Scale( impulseVector, 1 / m2 ) );
-
-      break;
+      v = { 1.0f, 0.0f };   // Default direction... TODO: randomize this
+      d = epsilon;
    }
-   };
+   else
+   {
+      Vector2 AB = Vector2Subtract( otherCircle->position, position );
+      v          = Vector2Normalize( AB );
+   }
+
+   float overlap = radius + otherCircle->radius - d;
+
+   /////// NOT NEEDED BUT I WANT TO HAVE IT
+   auto overlapSquare = overlap * overlap;
+   auto r1Square      = radius * radius;
+   auto r2Square      = otherCircle->radius * otherCircle->radius;
+   auto h = ( overlapSquare + r1Square - r2Square ) / ( 2 * overlap );
+   auto M = Vector2Add( position, Vector2Scale( v, h ) );
+   std::cout << "Collision point position: (" << M.x << "," << M.y << ")\n";
+   ////////////////////////////////////////
+
+   Vector2 correction = Vector2Scale(
+       v, overlap * 0.5f );   // 0.5 because i update both objects here
+
+   position = Vector2Subtract(
+       position, correction );   // Subtract weil v in B richtung zeigt daher OP
+                                 // = OP - v damit wir weg von B gehen
+   otherCircle->position = Vector2Add(
+       otherCircle->position,
+       correction );   // Add weil wir jezt uns weg von A bewegen wollen aber v
+                       // in richtung a schaut daher OP = OP + v damit wir in
+                       // die richung weiter gehen wohin v zeigt also von A nach
+                       // B
+
+   Vector2 relVelocity =
+       Vector2Subtract( velocity, otherCircle->velocity );   // v1 - v2
+
+   float velocityAlongNormal = Vector2DotProduct( relVelocity, v );
+   if ( velocityAlongNormal > 0 )
+   {
+      float e  = 0.8f;
+      float m1 = mass;
+      float m2 = otherCircle->mass;
+      float j  = -( 1 + e ) * velocityAlongNormal / ( 1 / m1 + 1 / m2 );
+
+      Vector2 impulse = Vector2Scale( v, j );
+
+      std::cout << "Before: this " << velocity.y << ", other "
+                << otherCircle->velocity.y << "\n";
+      velocity = Vector2Add( velocity, Vector2Scale( impulse, 1 / m1 ) );
+      otherCircle->velocity = Vector2Subtract(
+          otherCircle->velocity, Vector2Scale( impulse, 1 / m2 ) );
+
+      std::cout << "After: this " << velocity.y << "\n";
+   }
+
+   // If nearly at no movement is there make them stop
+   const float restThreshold = 0.01f;
+   if ( fabs( velocityAlongNormal ) < epsilon )
+   {
+      velocity = Vector2Scale( velocity, 0.5f );
+      if ( Vector2Length( velocity ) < restThreshold )
+      {
+         velocity = { 0.0f, 0.0f };
+      }
+
+      return;
+   }
 }
 
 };   // namespace sand
