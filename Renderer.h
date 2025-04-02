@@ -9,7 +9,7 @@ class Renderer_t
 {
  public:
    Renderer_t( int w, int h ) : screenWidth{ w }, screenHeight{ h } {}
-   void render( const PhysicsWorld_t& world );
+   void render( PhysicsWorld_t& world );
 
  private:
    int screenWidth;

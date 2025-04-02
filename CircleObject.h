@@ -17,10 +17,16 @@ class CircleObject_t : public PhysicsObject_t
 
    ~CircleObject_t() override = default;
 
-   void  update( float dt ) override;
-   void  onGroundCollision( float groundY ) override;
+   void update( float dt, bool isGravityActivated ) override;
+
+   void onGroundCollision( float groundY, bool isGravityActivated ) override;
+   void onBorderCollision( float leftBorderX, float rightBorderX ) override;
+
    float getBottomExtent() const override { return position.y + radius; }
-   void  onObjectCollision( PhysicsObject_t& other ) override;
+   float getLeftExtent() const override { return position.x - radius; }
+   float getRightExtent() const override { return position.x + radius; }
+
+   void onObjectCollision( PhysicsObject_t& other ) override;
 
    // clang-format off
    void dump() const override

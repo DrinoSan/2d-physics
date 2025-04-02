@@ -14,15 +14,18 @@ PhysicsObject_t::PhysicsObject_t( Vector2 position_, Vector2 velocity_,
 }
 
 // ----------------------------------------------------------------------------
-void PhysicsObject_t::update( float dt )
+void PhysicsObject_t::update( float dt, bool isGravityActivated )
 {
-   velocity =
-       Vector2Add( velocity, Vector2Scale( acceleration, dt ) );   // v = a * t
+   if ( isGravityActivated == true )
+   {
+      velocity = Vector2Add( velocity,
+                             Vector2Scale( acceleration, dt ) );   // v = a * t
+   }
+
    position =
        Vector2Add( position, Vector2Scale( velocity, dt ) );   // v = s / t
-   // Renderer only needs the position and other child class related values depending on render function in child
+   // Renderer only needs the position and other child class related values
+   // depending on render function in child
 }
-
-
 
 };   // namespace sand

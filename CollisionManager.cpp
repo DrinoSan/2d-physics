@@ -1,20 +1,27 @@
 #include "CollisionManager.h"
 #include "CircleObject.h"
+#include <assert.h>
 #include <unistd.h>
 
 namespace sand
 {
 // ----------------------------------------------------------------------------
 void CollisionManager_t::checkCollisions(
-    const std::vector<std::unique_ptr<PhysicsObject_t>>& objects,
-    float                                                groundY )
+    const std::vector<std::unique_ptr<PhysicsObject_t>>& objects, float groundY,
+    float leftborderX, float rightBorderX, bool isGravityActivated )
 {
    for ( auto& obj : objects )
    {
       if ( obj->getBottomExtent() > groundY && obj->velocity.y > 0 )
       {
          // Should be called for each object
-         obj->onGroundCollision( groundY );
+         obj->onGroundCollision( groundY, isGravityActivated );
+      }
+
+      if ( ( obj->getLeftExtent() < leftborderX && obj->velocity.x < 0 ) ||
+           ( obj->getRightExtent() > rightBorderX && obj->velocity.x > 0 ) )
+      {
+         obj->onBorderCollision( leftborderX, rightBorderX );
       }
    }
 

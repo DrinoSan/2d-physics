@@ -28,16 +28,20 @@ class PhysicsObject_t
 
    // Function to update objects velocity, acceleration, position based ob
    // prevoius values
-   virtual void update( float dt );
+   virtual void update( float dt, bool isGravityActivated );
 
    // Check if object hit the ground
-   virtual void onGroundCollision( float groundY ) = 0;
+   virtual void onGroundCollision( float groundY, bool isGravityActivated ) = 0;
+   // Check border collision
+   virtual void onBorderCollision( float leftBorderX, float rightBorderX ) = 0;
 
    // Resolve colision
    virtual void onObjectCollision( PhysicsObject_t& other ) = 0;
 
    // Get lowest point of object
    virtual float getBottomExtent() const = 0;
+   virtual float getLeftExtent() const   = 0;
+   virtual float getRightExtent() const  = 0;
 
    // Function to draw given object
    virtual void render() const = 0;

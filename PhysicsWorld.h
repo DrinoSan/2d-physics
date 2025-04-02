@@ -4,16 +4,18 @@
 #include <memory>
 #include <vector>
 
+#include "CollisionManager.h"
 #include "Force.h"
 #include "PhysicsObject.h"
-#include "CollisionManager.h"
 
 namespace sand
 {
 class PhysicsWorld_t
 {
  public:
-   PhysicsWorld_t( float ground );
+   PhysicsWorld_t( float ground, bool hasSideBorder_ = false );
+   PhysicsWorld_t( float ground, float distanceFromCenter_,
+                   bool hasSideBorder_ = false );
 
    void addObject( std::unique_ptr<PhysicsObject_t> object );
    void addForce( std::unique_ptr<Force_t> force );
@@ -23,13 +25,17 @@ class PhysicsWorld_t
       return objects;
    }
 
-   float getGroundY() const { return groundY; }
+   float groundY;              // Y-position of the ground
+   float distanceFromCenter;   // I only use symentrical borders...
+   float leftBorder;           // I only use symentrical borders...
+   float rightBorder;          // I only use symentrical borders...
+   bool  hasSideBorder;
+   bool  isGravityActivated;
 
  private:
    std::vector<std::unique_ptr<PhysicsObject_t>>
                                          objects;   // List of physics objects
    std::vector<std::unique_ptr<Force_t>> forces;    // List of forces
-   float                                 groundY;   // Y-position of the ground
 
    CollisionManager_t collisionManager{};
 };

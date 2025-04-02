@@ -4,13 +4,28 @@
 namespace sand
 {
 // ----------------------------------------------------------------------------
-void CircleObject_t::update( float dt )
+void CircleObject_t::update( float dt, bool isGravityActivated )
 {
-   PhysicsObject_t::update( dt );
+   PhysicsObject_t::update( dt, isGravityActivated );
 }
 
 // ----------------------------------------------------------------------------
-void CircleObject_t::onGroundCollision( float groundY )
+void CircleObject_t::onBorderCollision( float leftBorderX, float rightBorderX )
+{
+   if ( getLeftExtent() < leftBorderX && velocity.x < 0 )
+   {
+      position.x = leftBorderX + radius;
+   }
+   else if ( getRightExtent() > rightBorderX && velocity.x > 0 )
+   {
+      position.x = rightBorderX - radius;
+   }
+
+   velocity.x *= -1;
+}
+
+// ----------------------------------------------------------------------------
+void CircleObject_t::onGroundCollision( float groundY, bool isGravityActivated )
 {
    // Check collision with ground
    if ( velocity.y > 3.0f )
@@ -19,11 +34,18 @@ void CircleObject_t::onGroundCollision( float groundY )
    }
    else
    {
-      velocity.y = 0.0f;   // Stop the ball, but will again be changes after gravity hits and then the collision will be checked and so on
-      // To be more precise gravity will change the accelration field and physicObject::update will change the velocity
+      // Stop the ball, but will again be changes after gravity hits
+      // and then the collision will be checked and so on
+      // To be more precise gravity will change the accelration field and
+      // physicObject::update will change the velocity
+      if ( isGravityActivated == true )
+      {
+         velocity.y = 0.0f;
+      }
    }
 
-   position.y = groundY - radius;   // Always correct position so it does not fall under the line
+   // Always correct position so it does not fall under the line
+   position.y = groundY - radius;
 }
 
 // ----------------------------------------------------------------------------
@@ -89,13 +111,9 @@ void CircleObject_t::onObjectCollision( PhysicsObject_t& other )
 
       Vector2 impulse = Vector2Scale( v, j );
 
-      std::cout << "Before: this " << velocity.y << ", other "
-                << otherCircle->velocity.y << "\n";
       velocity = Vector2Add( velocity, Vector2Scale( impulse, 1 / m1 ) );
       otherCircle->velocity = Vector2Subtract(
           otherCircle->velocity, Vector2Scale( impulse, 1 / m2 ) );
-
-      std::cout << "After: this " << velocity.y << "\n";
    }
 
    // If nearly at no movement is there make them stop
